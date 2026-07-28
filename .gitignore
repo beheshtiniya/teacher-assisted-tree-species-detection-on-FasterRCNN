@@ -1,0 +1,12 @@
+
+config/paths.local.json
+outputs/
+__pycache__/
+*.py[cod]
+*.log
+*.tmp
+*.pth
+*.pt
+*.zip
+.DS_Store
+Thumbs.db

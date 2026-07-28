@@ -1,0 +1,22 @@
+name: teacher-assisted-tree-detection
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - numpy
+  - pandas
+  - pillow
+  - pyyaml
+  - tqdm
+  - matplotlib
+  - seaborn
+  - scikit-learn
+  - pytorch
+  - torchvision
+  - pytorch-cuda=12.1
+  - pip:
+      - torchmetrics
+      - pycocotools
