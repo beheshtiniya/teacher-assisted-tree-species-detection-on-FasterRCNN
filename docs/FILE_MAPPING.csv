@@ -1,0 +1,18 @@
+old_name,status,new_name,reason
+prepare_mydata_640*.py,REPLACE,src/data/prepare_mydata_640.py,one configurable copy
+make_configs*.py,REPLACE,src/efficienttree/make_configs.py,one configurable copy
+01_prepare_test_images*.py,REPLACE,src/efficienttree/prepare_image_folder.py,duplicate copies
+02_export_predictions*.py,REPLACE,src/efficienttree/export_predictions.py,duplicate copies
+03_scale_predictions*.py,REPLACE,src/efficienttree/scale_predictions_640_to_256.py,duplicate copies
+04_filter_overlap_and_merge*.py,REPLACE,src/efficienttree/filter_overlap_and_merge.py,duplicate copies
+05_validate_final_csv*.py,REPLACE,src/validation/validate_detection_csv.py,duplicate copies
+article2_retina2*,REPLACE,src/retinanet/train_retinanet.py,hard-coded paths and temporary name
+article2_predictions*,REPLACE,src/retinanet/predict_retinanet.py,hard-coded paths and temporary name
+dual_teacher_fusion*,REPLACE,src/fusion/dual_teacher_fusion.py,multiple conflicting versions
+build_dual_teacher_warmstart_labels*,REPLACE,src/fusion/build_warmstart_labels.py,hard-coded paths
+build_studyII_A1_supervised_et*,REPLACE,stage 08 + build_expert_plus_predictions.py,centralized prediction pipeline
+build_studyII_A2_from_A1_and_Retina*,REPLACE,stage 11 + build_A2_from_fusion.py,single fusion implementation
+build_train_ef_ssl_conf_gt_0p5*,DELETE,none,threshold/code mismatch
+fasterrcnn*.py,REPLACE,src/fasterrcnn/train_fasterrcnn.py,hard-coded paths
+end_to_end_pipeline_controller_v3*,ARCHIVE,run_stage.py,simpler numbered stages
+end_to_end_pipeline_config_*.json,ARCHIVE,config/paths.local.json,one local path configuration
