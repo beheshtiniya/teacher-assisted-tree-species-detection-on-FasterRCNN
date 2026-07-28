@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "project_root": "C:/path/to/Teacher_Assisted_Tree_Detection",
+  "data_root": "D:/path/to/teacher_student",
+  "python_executable": "python",
+  "efficienttree_repo": "C:/path/to/Teacher_Assisted_Tree_Detection/EfficientTree-master",
+  "output_root": "D:/path/to/teacher_student/tatd_outputs",
+  "classes": [
+    "class1",
+    "class2",
+    "class3",
+    "class4"
+  ],
+  "settings": {
+    "image_size_et": 640,
+    "image_size_csv": 256,
+    "confidence": 0.25,
+    "gt_iou": 0.5,
+    "agreement_iou": 0.5,
+    "single_model_confidence": 0.8,
+    "warmstart_confidence": 0.5,
+    "et_epochs": 45,
+    "retina_runs": 3,
+    "retina_epochs": 80,
+    "fasterrcnn_runs": 5,
+    "fasterrcnn_epochs": 20
+  }
+}
