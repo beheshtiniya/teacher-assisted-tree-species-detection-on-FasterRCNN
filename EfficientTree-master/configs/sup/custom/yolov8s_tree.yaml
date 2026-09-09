@@ -1,0 +1,59 @@
+# Parameters
+project: 'runs/sup/yolov8s'
+adam: False
+epochs: 300
+weights: 'D:\pythonProject\efficientteacher\scripts\mula_convertor\efficient-yolov8s.pt'
+prune_finetune: False
+hyp:
+  lr0: 0.01
+  hsv_h: 0.015
+  hsv_s: 0.7
+  hsv_v: 0.4
+  lrf: 0.2
+  warmup_epochs: 0
+  no_aug_epochs: 0
+
+Model:
+  depth_multiple: 0.33  # model depth multiple
+  width_multiple: 0.5  # layer channel multiple
+  Backbone:
+    name: 'YoloV8_resnet'
+    activation: 'SiLU'
+  Neck:
+    name: 'YoloV8_glff'
+    in_channels:  [256, 512, 1024]
+    out_channels: [256, 512, 1024]
+    activation: 'SiLU'
+  Head:
+    name: 'YoloV5'
+    activation: 'SiLU'
+    strides: [8,16,32]
+    in_channels: [128,256,512]
+  anchors: [[10,13, 16,30, 33,23],[30,61, 62,45, 59,119],[116,90, 156,198, 373,326]]  # P5/32]
+
+
+
+Loss:
+  type: 'ComputeLoss'
+#  cls: 0.3
+#  obj: 0.7
+#  anchor_t: 4.0
+#  type: 'ComputeTalLoss'
+#  use_dfl: True
+#  use_gfl: False
+#  reg_max: 16
+#  qfl_loss_weight: 0.5
+#  dfl_loss_weight: 1.5
+#  box_loss_weight: 7.5
+
+Dataset:
+  data_name: 'tree'
+  train: D:\pythonProject\efficientteacher\data\hall\tree_overlap_0_patch_640\train.txt
+  val: D:\pythonProject\efficientteacher\data\hall\tree_overlap_0_patch_640\val.txt
+  test: D:\pythonProject\efficientteacher\data\hall\tree_overlap_0_patch_640\test.txt
+  nc: 6  
+  np: 0 
+  names: ['deodar cedar', 'dawn redwood', 'china cedar','masson pine', 'golden larch', 'ginkgo']
+  img_size: 640
+  batch_size: 32
+  workers: 0

@@ -1,0 +1,100 @@
+# Parameters
+project: 'runs/ssod/yolov8s_tree'
+adam: False
+epochs: 200
+weights: 'D:\pythonProject\efficientteacher\scripts\mula_convertor\efficient-yolov8s.pt'
+prune_finetune: False
+linear_lr: True
+find_unused_parameters: True
+
+hyp:
+  lr0: 0.01
+  hsv_h: 0.015
+  hsv_s: 0.7
+  hsv_v: 0.4
+  #lrf: 1.0
+  lrf: 0.2
+  #scale: 0.9
+  burn_epochs: 1
+  warmup_epochs: 0
+  #mixup: 0.1
+  no_aug_epochs: 0
+
+
+Model:
+  depth_multiple: 0.33  # model depth multiple
+  width_multiple: 0.5  # layer channel multiple
+  Backbone:
+    name: 'YoloV8_resnet'
+    activation: 'SiLU'
+  Neck:
+    name: 'YoloV8_glff'
+    in_channels: [256, 512, 1024]
+    out_channels: [256, 512, 1024]
+    activation: 'SiLU'
+  Head:
+    name: 'YoloV5'
+    activation: 'SiLU'
+  anchors: [[10,13, 16,30, 33,23],[30,61, 62,45, 59,119],[116,90, 156,198, 373,326]]  # P5/32]
+  #anchors: [1]
+Loss:
+  type: 'ComputeLoss'
+
+#  type: 'ComputeTalLoss'
+#  use_dfl: True
+#  use_gfl: False
+#  reg_max: 16
+#  qfl_loss_weight: 0.5
+#  dfl_loss_weight: 1.5
+#  box_loss_weight: 7.5
+
+Dataset:
+  data_name: 'tree'
+  train: D:\pythonProject\efficientteacher\data\hall\tree_overlap_0_patch_640\train.txt  # 118287 images
+  val: D:\pythonProject\efficientteacher\data\hall\tree_overlap_0_patch_640\val.txt  # 5000 images
+  test: D:\pythonProject\efficientteacher\data\hall\tree_overlap_0_patch_640\test.txt # 20288 of 40670 images, submit to https://competitions.codalab.org/competitions/20794^
+  target: D:\pythonProject\efficientteacher\data\temple\tree_overlap_0_patch_640\train.txt
+  nc: 6  # number of classes
+  np: 0 #number of keypoints
+  names: ['deodar cedar', 'dawn redwood', 'china cedar','masson pine', 'golden larch', 'ginkgo']
+  #img_size: [704, 704]
+  img_size: 640
+  batch_size: 24
+  workers: 0
+
+SSOD:
+  train_domain: True
+  nms_conf_thres: 0.1
+  nms_iou_thres: 0.4
+  teacher_loss_weight: 1.0
+  cls_loss_weight: 0.3
+  box_loss_weight: 0.05
+  obj_loss_weight: 0.7
+  loss_type: 'ComputeStudentMatchLoss'
+  ignore_thres_low: 0.2   #低阈值，不可信，处于中间属于不确定
+  ignore_thres_high: 0.8 #高阈值，可信
+  uncertain_aug: True
+  use_ota: False
+  multi_label: False
+  ignore_obj: False
+  pseudo_label_with_obj: True
+  pseudo_label_with_bbox: True
+  pseudo_label_with_cls: False
+  with_da_loss: True
+  da_loss_weights: 0.01
+  epoch_adaptor: True
+  resample_high_percent: 0.25
+  resample_low_percent: 0.99
+  ema_rate: 0.999
+  cosine_ema: True
+  imitate_teacher: False
+  #dynamic_thres: True
+  ssod_hyp:
+    with_gt: False
+    mosaic: 1.0  #1.0
+    cutout: 0.5 #0.5
+    autoaugment: 0.5
+    scale: 0.8 #0.8
+    degrees: 0.0
+    shear: 0.0
+  debug: True

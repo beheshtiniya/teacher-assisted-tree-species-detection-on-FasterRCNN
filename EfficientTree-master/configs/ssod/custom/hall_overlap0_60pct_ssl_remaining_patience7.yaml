@@ -1,0 +1,112 @@
+project: E:\FASTRCNN\FASTRCNN\EfficientTree-paper\EfficientTree-master\runs\hall_overlap0_reproduction
+adam: false
+epochs: 100
+weights: E:\FASTRCNN\FASTRCNN\EfficientTree-paper\EfficientTree-master\scripts\mula_convertor\efficient-yolov8s.pt
+prune_finetune: false
+linear_lr: true
+find_unused_parameters: true
+hyp:
+  lr0: 0.01
+  hsv_h: 0.015
+  hsv_s: 0.7
+  hsv_v: 0.4
+  lrf: 0.2
+  burn_epochs: 1
+  warmup_epochs: 0
+  no_aug_epochs: 0
+Model:
+  depth_multiple: 0.33
+  width_multiple: 0.5
+  Backbone:
+    name: YoloV8_resnet
+    activation: SiLU
+  Neck:
+    name: YoloV8_glff
+    in_channels:
+    - 256
+    - 512
+    - 1024
+    out_channels:
+    - 256
+    - 512
+    - 1024
+    activation: SiLU
+  Head:
+    name: YoloV5
+    activation: SiLU
+  anchors:
+  - - 10
+    - 13
+    - 16
+    - 30
+    - 33
+    - 23
+  - - 30
+    - 61
+    - 62
+    - 45
+    - 59
+    - 119
+  - - 116
+    - 90
+    - 156
+    - 198
+    - 373
+    - 326
+Loss:
+  type: ComputeLoss
+Dataset:
+  data_name: hall_overlap0
+  train: E:\FASTRCNN\FASTRCNN\EfficientTree-paper\EfficientTree-master\data\hall\tree_overlap_0_patch_640\reproduction_splits_v3\train_60_percent.txt
+  val: E:\FASTRCNN\FASTRCNN\EfficientTree-paper\EfficientTree-master\data\hall\tree_overlap_0_patch_640\reproduction_splits_v3\val.txt
+  test: E:\FASTRCNN\FASTRCNN\EfficientTree-paper\EfficientTree-master\data\hall\tree_overlap_0_patch_640\reproduction_splits_v3\test.txt
+  target: E:\FASTRCNN\FASTRCNN\EfficientTree-paper\EfficientTree-master\data\hall\tree_overlap_0_patch_640\reproduction_splits_v3\target_remaining_train_60_percent.txt
+  nc: 6
+  np: 0
+  names:
+  - deodar cedar
+  - dawn redwood
+  - china cedar
+  - masson pine
+  - golden larch
+  - ginkgo
+  img_size: 640
+  batch_size: 4
+  workers: 0
+SSOD:
+  train_domain: true
+  nms_conf_thres: 0.1
+  nms_iou_thres: 0.4
+  teacher_loss_weight: 1.0
+  cls_loss_weight: 0.3
+  box_loss_weight: 0.05
+  obj_loss_weight: 0.7
+  loss_type: ComputeStudentMatchLoss
+  ignore_thres_low: 0.2
+  ignore_thres_high: 0.8
+  uncertain_aug: true
+  use_ota: false
+  multi_label: false
+  ignore_obj: false
+  pseudo_label_with_obj: true
+  pseudo_label_with_bbox: true
+  pseudo_label_with_cls: false
+  with_da_loss: true
+  da_loss_weights: 0.01
+  epoch_adaptor: true
+  resample_high_percent: 0.25
+  resample_low_percent: 0.99
+  ema_rate: 0.999
+  cosine_ema: true
+  imitate_teacher: false
+  ssod_hyp:
+    with_gt: false
+    mosaic: 1.0
+    cutout: 0.5
+    autoaugment: 0.5
+    scale: 0.8
+    degrees: 0.0
+    shear: 0.0
+  debug: false
+name: hall_overlap0_60pct_ssl_remaining_patience7
+exist_ok: false
