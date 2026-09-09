@@ -228,7 +228,7 @@ def compute_iou_matrix(boxes1, boxes2):
 
 
 def update_confusion_matrix(conf_mat, gt_boxes, gt_labels, pred_boxes, pred_labels, pred_scores,
-                            iou_threshold=0.5, score_threshold=0.5):
+                            iou_threshold=0.5, score_threshold=0.25):
     if pred_boxes.numel() > 0:
         keep = pred_scores >= score_threshold
         pred_boxes = pred_boxes[keep]
@@ -328,7 +328,7 @@ def evaluate_map(model, data_loader, device):
 
 
 @torch.no_grad()
-def evaluate_map_and_confusion(model, data_loader, device, iou_threshold=0.5, score_threshold=0.5):
+def evaluate_map_and_confusion(model, data_loader, device, iou_threshold=0.5, score_threshold=0.25):
     """استفاده در پایان هر Run برای تست نهایی"""
     model.eval()
 
@@ -465,7 +465,7 @@ class EarlyStopping:
 def parse_args():
     p=argparse.ArgumentParser(description='Train Faster R-CNN with repeated seeded runs.')
     p.add_argument('--images-dir',required=True); p.add_argument('--train-csv',required=True); p.add_argument('--val-csv',required=True); p.add_argument('--test-csv',required=True); p.add_argument('--output-dir',required=True)
-    p.add_argument('--num-runs',type=int,default=5); p.add_argument('--max-epochs',type=int,default=20); p.add_argument('--batch-size',type=int,default=4); p.add_argument('--workers',type=int,default=0); p.add_argument('--base-seed',type=int,default=42); p.add_argument('--patience',type=int,default=5); p.add_argument('--min-delta',type=float,default=1e-4); p.add_argument('--lr',type=float,default=0.005); p.add_argument('--weight-decay',type=float,default=0.0005); p.add_argument('--iou-threshold',type=float,default=0.5); p.add_argument('--score-threshold',type=float,default=0.5)
+    p.add_argument('--num-runs',type=int,default=5); p.add_argument('--max-epochs',type=int,default=20); p.add_argument('--batch-size',type=int,default=4); p.add_argument('--workers',type=int,default=0); p.add_argument('--base-seed',type=int,default=42); p.add_argument('--patience',type=int,default=5); p.add_argument('--min-delta',type=float,default=1e-4); p.add_argument('--lr',type=float,default=0.005); p.add_argument('--weight-decay',type=float,default=0.0005); p.add_argument('--iou-threshold',type=float,default=0.25); p.add_argument('--score-threshold',type=float,default=0.5)
     return p.parse_args()
 
 def main():
