@@ -1,8 +1,4 @@
-بله. با کارهایی که بعداً انجام دادیم، README فعلی باید کمی جدی‌تر به‌روزرسانی شود، چون الان فقط یک pipeline عمومی را توضیح می‌دهد و **Best A3 در Experiment 3 و انتقال همان مسیر به Dataset 3 در Experiment 4** را صریح ثبت نمی‌کند.
 
-نسخه‌ی زیر را می‌توانی به‌عنوان README اصلی GitHub جایگزین متن فعلی کنی. سعی کردم ساختار قبلی را حفظ کنم، ولی بخش‌های Experiment 3/4، آرشیو نتایج، منابع Dataset 2/3 و پروتکل Faster R-CNN را اضافه و بعضی اصطلاحات قدیمی را دقیق‌تر کنم.
-
-````markdown
 # Teacher-Assisted Tree Species Detection
 
 This repository contains the software, configuration files, and
