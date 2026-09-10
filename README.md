@@ -85,6 +85,7 @@ https://github.com/beheshtiniya/pseudo-labeling-confidence-thresholds-tree-speci
 
 ---
 
+
 ## Experimental overview
 
 The study was organized into four main experiments.
@@ -99,6 +100,30 @@ Datasets 1, 2, and 3 use different image allocations and test
 partitions. Their results are therefore interpreted as a
 dataset-partition sensitivity analysis rather than as a controlled
 ranking of partitioning strategies.
+Dataset~1, including the labeled aerial RGB imagery, expert annotations,
+and the associated unlabeled-image collection, is available at
+\url{https://doi.org/10.5281/zenodo.21385214}.
+The original pre-annotated dataset introduced in~\cite{ref1} is available
+at
+\url{https://doi.org/10.5281/zenodo.7528566}.
+
+Dataset~2 reconstruction resources are archived separately at
+\url{https://zenodo.org/records/22013937}, and the image-level MILP
+construction and partitioning resources for Dataset~3 are available at
+\url{https://zenodo.org/records/22013323}.
+
+The Best A3 reproducibility package for Experiments~3 and~4 is available
+at
+\url{https://zenodo.org/records/22063524}.
+This archive includes the Best A3 annotation-expanded dataset generated
+on Dataset~2 in Experiment~3, the corresponding transferred Best A3
+dataset for Dataset~3 in Experiment~4, downstream Faster R-CNN run-level
+results, and the Faster R-CNN training and evaluation code used for the
+repeated experiments.
+
+The EfficientTree implementation used in the study was based on the
+public source code released by~\cite{hou2025uav}, available at
+\url{https://github.com/houbr233/EfficientTree}.
 
 ### Experiment 2 -- Single-model pseudo-label expansion
 
