@@ -1,465 +1,534 @@
-
 # Teacher-Assisted Tree Species Detection
 
-This repository contains the software, configuration files, and
-reproducibility pipeline used for tree-species object detection in
-heterogeneous forests using aerial RGB imagery.
+This repository contains the software, configuration files, processing
+utilities, and reproducibility pipeline developed for tree-species object
+detection in heterogeneous dense forests using high-resolution aerial RGB
+imagery.
 
-The study combines supervised and semi-supervised object-detection
-workflows, including EfficientTree/EfficientTeacher, RetinaNet,
-multi-source prediction fusion, warm-start Teacher--Student
-semi-supervised learning, annotation expansion, and downstream
-Faster R-CNN evaluation.
+The study follows a data-centric object-detection framework in which
+Faster R-CNN is retained as the common downstream detector. The complete
+workflow combines supervised detection, pseudo-label generation,
+confidence-based selection, multi-source prediction fusion, EfficientTree
+retraining, warm-start Teacher–Student semi-supervised learning (SSL),
+annotation expansion, and repeated downstream Faster R-CNN evaluation.
 
-The repository supports the experimental workflow reported across four
-experiments, including the development of the Best A3 annotation-expansion
-strategy in Experiment 3 and its transfer to Dataset 3 in Experiment 4.
+Four progressive experiments are supported. These experiments examine
+dataset-construction sensitivity, single-model pseudo-labeling,
+multi-source annotation refinement, development of the **Best A3**
+configuration on Dataset 2, and transfer of the same refinement pathway
+to Dataset 3.
 
-> **Important:** The image dataset is not included in this software
-> repository and must be downloaded separately from Zenodo:
-> https://doi.org/10.5281/zenodo.21385214
+> **Important:** The aerial imagery and associated datasets are not
+> included directly in this GitHub repository. They must be downloaded
+> separately from the Zenodo resources listed below.
 
 ---
 
-## Associated data and reproducibility resources
+## Associated Data and Reproducibility Resources
 
-### Main aerial-image dataset
+### Original Pre-Annotated Dataset
 
-The aerial RGB imagery, expert annotations, unlabeled imagery, and
-Dataset 1--2 resources are publicly available at:
+The original pre-annotated tree-species dataset used as the source
+collection in this study is publicly available at:
+
+https://doi.org/10.5281/zenodo.7528566
+
+The released labeled collection used in the present experiments contains
+4,438 aerial RGB image patches and 10,128 expert-provided bounding boxes
+for four tree species.
+
+Datasets 1, 2, and 3 used in this study are alternative
+train–validation–test constructions derived from this same labeled
+collection. They are not independently collected datasets.
+
+---
+
+### Dataset 1 and Additional Unlabeled Imagery
+
+Dataset 1, including the labeled aerial RGB imagery, expert annotations,
+and the associated additional unlabeled-image collection, is available at:
 
 **Dataset for Tree Species Detection in Heterogeneous Forests Using
 Aerial RGB Imagery**
 
-**DOI:**  
 https://doi.org/10.5281/zenodo.21385214
 
-The original pre-annotated dataset introduced in the source study is
-available at:
+---
 
-https://doi.org/10.5281/zenodo.7528566
+### Dataset 2 Reconstruction Resources
 
-### Dataset 2 reconstruction resources
-
-Resources used to reconstruct Dataset 2 are archived at:
+Resources used to reconstruct the Dataset 2 train–validation–test
+configuration are archived at:
 
 https://zenodo.org/records/22013937
 
-### Dataset 3 partitioning resources
+---
 
-The image-level MILP partitioning resources used to construct Dataset 3
-are archived at:
+### Dataset 3 Partitioning Resources
+
+The image-level mixed-integer linear programming (MILP) resources used to
+construct Dataset 3 are archived at:
 
 https://zenodo.org/records/22013323
 
-### Best A3 results from Experiments 3 and 4
+Dataset 3 uses a fixed image-level 60/20/20 train–validation–test
+construction with class-composition balancing performed through MILP.
 
-The annotation-expanded Best A3 datasets, downstream Faster R-CNN
-results, and reproducibility materials associated with Experiments 3
-and 4 are available at:
+---
 
-https://zenodo.org/uploads/22063524
+### Best A3 Reproducibility Package
 
-This archive contains materials associated with:
+The annotation-expanded datasets, downstream Faster R-CNN results, and
+reproducibility materials associated with the selected Best A3 pathway in
+Experiments 3 and 4 are available at:
 
-- Best A3 obtained in Experiment 3 using Dataset 2;
+https://zenodo.org/records/22063524
+
+The archive includes materials associated with:
+
+- Best A3 developed on Dataset 2 in Experiment 3;
 - transfer of the same Best A3 pathway to Dataset 3 in Experiment 4;
-- repeated Faster R-CNN evaluation;
-- run-level evaluation outputs;
-- annotation-expanded training data; and
-- Faster R-CNN reproducibility resources.
+- annotation-expanded training data;
+- repeated downstream Faster R-CNN evaluations;
+- run-level evaluation outputs; and
+- Faster R-CNN training and evaluation resources used for reproducibility.
 
-### Complete software archive
+---
 
-The complete tree-species detection and multi-source pseudo-label
-refinement software archive is available at:
+### Complete Software Archive
+
+A complete archived release of the tree-species detection and multi-source
+pseudo-label refinement software is available at:
 
 https://doi.org/10.5281/zenodo.21639908
 
-### Confidence-threshold pseudo-labeling implementation
+---
 
-The confidence-threshold pseudo-labeling implementation used in the
-earlier experimental stage is available separately at:
+### Confidence-Threshold Pseudo-Labeling Repository
+
+The confidence-threshold pseudo-labeling implementation used in
+Experiment 2 is maintained separately at:
 
 https://github.com/beheshtiniya/pseudo-labeling-confidence-thresholds-tree-species-identification
 
 ---
 
+### EfficientTree Source Implementation
 
-## Experimental overview
+The EfficientTree component used in this study was based on the public
+implementation released by Hou et al.:
 
-The study was organized into four main experiments.
+https://github.com/houbr233/EfficientTree
 
-### Experiment 1 -- Sensitivity to dataset construction
+The present repository contains the study-specific data preparation,
+configuration, prediction processing, fusion, SSL integration, and
+downstream reproducibility workflow required to use EfficientTree within
+the tree-species annotation-expansion experiments.
 
-Experiment 1 evaluated supervised Faster R-CNN performance under three
-alternative dataset constructions derived from the labeled image
-collection.
+---
 
-Datasets 1, 2, and 3 use different image allocations and test
-partitions. Their results are therefore interpreted as a
-dataset-partition sensitivity analysis rather than as a controlled
-ranking of partitioning strategies.
-Dataset~1, including the labeled aerial RGB imagery, expert annotations,
-and the associated unlabeled-image collection, is available at
-\url{https://doi.org/10.5281/zenodo.21385214}.
-The original pre-annotated dataset introduced in~\cite{ref1} is available
-at
-\url{https://doi.org/10.5281/zenodo.7528566}.
+# Experimental Overview
 
-Dataset~2 reconstruction resources are archived separately at
-\url{https://zenodo.org/records/22013937}, and the image-level MILP
-construction and partitioning resources for Dataset~3 are available at
-\url{https://zenodo.org/records/22013323}.
+The study is organized into four progressive experiments. Faster R-CNN
+serves as the common downstream detector in the main comparisons, allowing
+changes in detection performance to be interpreted primarily in relation
+to dataset construction and training-annotation refinement rather than a
+change in the final detector architecture.
 
-The Best A3 reproducibility package for Experiments~3 and~4 is available
-at
-\url{https://zenodo.org/records/22063524}.
-This archive includes the Best A3 annotation-expanded dataset generated
-on Dataset~2 in Experiment~3, the corresponding transferred Best A3
-dataset for Dataset~3 in Experiment~4, downstream Faster R-CNN run-level
-results, and the Faster R-CNN training and evaluation code used for the
-repeated experiments.
+---
 
-The EfficientTree implementation used in the study was based on the
-public source code released by~\cite{hou2025uav}, available at
-\url{https://github.com/houbr233/EfficientTree}.
+## Experiment 1 — Sensitivity to Dataset Construction
 
-### Experiment 2 -- Single-model pseudo-label expansion
+Experiment 1 evaluates supervised Faster R-CNN under three alternative
+train–validation–test constructions derived from the same complete
+labeled collection.
 
-Experiment 2 investigated whether predictions from a trained detector
-could be used to complete or refine training annotations.
+Datasets 1, 2, and 3 differ in image allocation, subset size, class
+composition, and test-set composition. Cross-dataset differences are
+therefore interpreted as **dataset-construction sensitivity** rather than
+as a controlled ranking of partitioning strategies.
 
-The experiment included confidence-threshold analysis and examined how
-pseudo-label selection affected downstream Faster R-CNN performance.
+Resources:
 
-The corresponding implementation is available in the separate
-confidence-threshold repository listed above.
+- Dataset 1 and additional unlabeled imagery:  
+  https://doi.org/10.5281/zenodo.21385214
 
-### Experiment 3 -- Multi-source annotation refinement and Best A3
+- Dataset 2 reconstruction resources:  
+  https://zenodo.org/records/22013937
 
-Experiment 3 was performed using Dataset 2 and progressively constructed
-the annotation-expanded datasets A0--A3.
+- Dataset 3 MILP partitioning resources:  
+  https://zenodo.org/records/22013323
 
-The principal stages were:
+- Original pre-annotated source dataset:  
+  https://doi.org/10.5281/zenodo.7528566
+
+---
+
+## Experiment 2 — Single-Model Pseudo-Label Expansion
+
+Experiment 2 investigates whether predictions from a trained Faster R-CNN
+detector can be used to complete or expand training annotations.
+
+Two preliminary studies are included:
+
+1. annotation completion on pre-existing labeled training images; and
+2. confidence-threshold analysis using a separate unlabeled image pool.
+
+The second study evaluates multiple prediction-confidence thresholds and
+examines how pseudo-label selection affects downstream Faster R-CNN
+performance.
+
+The corresponding implementation is available at:
+
+https://github.com/beheshtiniya/pseudo-labeling-confidence-thresholds-tree-species-identification
+
+The threshold settings used in Experiment 2 are specific to that
+experiment and should not be confused with the pseudo-label and
+Faster R-CNN evaluation thresholds used in Experiments 3 and 4.
+
+---
+
+## Experiment 3 — Multi-Source Annotation Refinement and Best A3
+
+Experiment 3 is performed on Dataset 2 and progressively constructs the
+annotation-expanded configurations A0–A3.
+
+The principal workflow is:
 
 1. train supervised EfficientTree;
 2. train RetinaNet;
-3. generate predictions from the complementary detectors;
-4. construct the native-confidence A2 annotation set through
-   multi-source prediction fusion;
+3. generate predictions from both auxiliary detectors;
+4. construct the native-confidence A2 annotation set through multi-source
+   prediction fusion;
 5. retrain EfficientTree using the expanded A2 labeled dataset;
-6. use the selected A2-trained EfficientTree checkpoint to warm-start
-   Teacher--Student semi-supervised learning;
-7. use the A2 expanded annotations as the labeled/source data and the
-   additional unlabeled image collection as the target data during SSL;
-8. generate SSL-enhanced predictions;
-9. perform the final A3 refinement; and
-10. train Faster R-CNN on the resulting annotation-expanded dataset.
+6. select the A2-trained EfficientTree checkpoint;
+7. use the selected checkpoint to warm-start Teacher–Student SSL;
+8. use A2 expanded annotations as labeled/source data and the additional
+   unlabeled-image collection as target data during SSL;
+9. generate SSL-enhanced EfficientTree predictions;
+10. perform the final A3 refinement; and
+11. train and evaluate Faster R-CNN on the resulting expanded annotation
+    set.
 
-The strongest Experiment 3 configuration was:
+The selected Experiment 3 configuration is:
 
-`A3_native,native`
+
+A3_native,native
 
 or equivalently:
 
-`A3_{\mathrm{native},\mathrm{native}}`
+A3_{native,native}
 
-This configuration is referred to throughout the study as **Best A3**.
+This configuration is referred to throughout the study as Best A3.
 
-Conceptually, the selected pathway was:
+Conceptually, the selected pathway is:
 
-```text
 Dataset 2 expert annotations
         |
-        +--> RetinaNet
+        +------------------> RetinaNet
         |
-        +--> supervised EfficientTree
-                    |
-                    v
-          native-confidence fusion
-                    |
-                    v
-               A2_native
-                    |
-                    v
-         retrain EfficientTree
-                    |
-                    v
-          selected checkpoint
-                    |
-                    v
-     warm-start Teacher--Student SSL
-       labeled/source = A2_native
-       target = unlabeled images
-                    |
-                    v
-        SSL-enhanced EfficientTree
-                    |
-                    v
-            final A3 refinement
-                    |
-                    v
-         A3_native,native
-                    |
-                    v
-             Faster R-CNN
-````
+        +------------------> supervised EfficientTree
+                                   |
+                                   v
+                         native-confidence fusion
+                                   |
+                                   v
+                              A2_native
+                                   |
+                                   v
+                        retrain EfficientTree
+                                   |
+                                   v
+                         selected checkpoint
+                                   |
+                                   v
+                 warm-start Teacher–Student SSL
+                     labeled/source = A2_native
+                     target = unlabeled images
+                                   |
+                                   v
+                    SSL-enhanced EfficientTree
+                                   |
+                                   v
+                         final A3 refinement
+                                   |
+                                   v
+                        A3_native,native
+                                   |
+                                   v
+                            Faster R-CNN
 
----
+The corresponding Best A3 reproducibility package is available at:
 
-## Experiment 4 -- Transfer of Best A3 to Dataset 3
+https://zenodo.org/records/22063524
 
-Experiment 4 tested whether the Best A3 pathway identified in
-Experiment 3 remained effective after transfer to Dataset 3.
+Experiment 4 — Transfer of Best A3 to Dataset 3
 
-The upstream annotation-expansion procedure was reproduced under the
-Dataset 3 construction rather than replacing it with a different
+Experiment 4 evaluates whether the Best A3 pathway identified in
+Experiment 3 remains effective after transfer to Dataset 3.
+
+The upstream annotation-expansion procedure is reproduced under the
+Dataset 3 construction rather than replaced by a different
 pseudo-labeling strategy.
 
-The main pathway was:
+The principal pathway is:
 
-```text
 Dataset 3 expert annotations
         |
-        +--> RetinaNet
+        +------------------> RetinaNet
         |
-        +--> supervised EfficientTree
-                    |
-                    v
-          native-confidence fusion
-                    |
-                    v
-               A2_native
-                    |
-                    v
-         retrain EfficientTree
-                    |
-                    v
-          selected checkpoint
-                    |
-                    v
-     warm-start Teacher--Student SSL
-       labeled/source = A2_native
-       target = unlabeled images
-                    |
-                    v
-        SSL-enhanced EfficientTree
-                    |
-                    v
-            final A3 refinement
-                    |
-                    v
-         A3_native,native
-```
+        +------------------> supervised EfficientTree
+                                   |
+                                   v
+                         native-confidence fusion
+                                   |
+                                   v
+                              A2_native
+                                   |
+                                   v
+                        retrain EfficientTree
+                                   |
+                                   v
+                         selected checkpoint
+                                   |
+                                   v
+                 warm-start Teacher–Student SSL
+                     labeled/source = A2_native
+                     target = unlabeled images
+                                   |
+                                   v
+                    SSL-enhanced EfficientTree
+                                   |
+                                   v
+                         final A3 refinement
+                                   |
+                                   v
+                        A3_native,native
 
-Two downstream Faster R-CNN configurations were then evaluated.
+Two downstream Faster R-CNN configurations are evaluated.
 
-### Best A3 without final unlabeled inclusion
+Best A3 Without Final Unlabeled Inclusion
 
-The final Faster R-CNN training set contained:
+The final Faster R-CNN training set contains:
 
-* the original Dataset 3 expert annotations; and
-* accepted Best A3 pseudo-labels generated for the labeled training
-  images.
+the original Dataset 3 expert annotations; and
+accepted Best A3 model-generated annotations for the labeled Dataset 3
+training images.
 
 Accepted pseudo-labels originating from the additional unlabeled-image
-collection were not added to the final Faster R-CNN training set.
+collection are not added to the final Faster R-CNN training set.
 
-### Best A3 with final unlabeled inclusion
+Importantly, the additional unlabeled imagery is still used during the
+upstream Teacher–Student SSL stage.
 
-The same upstream Best A3 pathway was used, but accepted predictions from
-the additional unlabeled-image collection were also added to the final
+Best A3 With Final Unlabeled Inclusion
+
+This configuration uses the same upstream Best A3 pathway, but accepted
+SSL-enhanced EfficientTree predictions generated on the additional
+unlabeled-image collection are also incorporated into the final
 Faster R-CNN training set.
 
-> **Important:** Both Experiment 4 configurations use the unlabeled-image
-> collection during the upstream Teacher--Student SSL stage.
-> The difference between the two configurations concerns only whether
-> accepted predictions from those unlabeled images are included in the
-> final Faster R-CNN training dataset.
+Important: Both Experiment 4 configurations use the additional
+unlabeled-image collection during the upstream Teacher–Student SSL
+stage. The difference concerns only whether accepted predictions
+originating from those unlabeled images are included in the final
+Faster R-CNN training dataset.
 
-This distinction is important for correctly reproducing Experiment 4.
+The corresponding reproducibility resources are available at:
 
----
+https://zenodo.org/records/22063524
 
-## Experimental datasets
+Experimental Dataset Notation
 
-The annotation-expansion workflow uses the following dataset notation:
+The annotation-expansion workflow uses the following notation:
 
-* **A0:** expert annotations only.
-* **A1:** expert annotations plus accepted predictions from an initial
-  auxiliary detector configuration.
-* **A2:** expert annotations plus accepted multi-source predictions from
-  EfficientTree and RetinaNet.
-* **A2_native:** the native-confidence A2 configuration selected as the
-  source for the subsequent Best A3 pathway.
-* **A3:** annotation-expanded data obtained after the warm-start
-  Teacher--Student refinement stage.
-* **A3_native,native:** the Best A3 configuration identified in
-  Experiment 3 and subsequently transferred to Dataset 3 in Experiment 4.
+A0: expert annotations only.
+A1: expert annotations plus accepted predictions from one auxiliary
+prediction source.
+A1–ET: expert annotations plus accepted supervised EfficientTree
+predictions.
+A1–RetinaNet: expert annotations plus accepted RetinaNet
+predictions.
+A2: expert annotations plus accepted predictions obtained through
+multi-source EfficientTree and RetinaNet fusion.
+A2_native: the native-confidence A2 configuration used as the
+warm-start source for the selected Best A3 pathway.
+A3: annotation-expanded data obtained after warm-start
+Teacher–Student refinement.
+A3_native,native: the selected Best A3 configuration developed on
+Dataset 2 and transferred to Dataset 3.
 
-Expert annotations have priority throughout the expansion process and
-are not replaced by model predictions.
+Expert annotations have priority throughout the main annotation-expansion
+workflow and are not replaced by model-generated predictions.
 
-Validation and test annotations remain separated from the training
-annotation-expansion pipeline.
+Validation and test annotations remain separate from the training
+annotation-expansion process.
 
----
+Prediction Fusion and Annotation Preservation
 
-## Prediction fusion and annotation preservation
+For the main Best A3 workflow, model-generated predictions are filtered
+before being combined with the expert annotations.
 
-For the main Best A3 workflow, predictions are filtered before being
-added to the expert annotations.
+The principal native-confidence annotation-refinement settings are:
 
-The principal reproducibility settings are:
+Candidate prediction confidence threshold:    0.25
+GT-overlap IoU threshold:                      0.50
+Prediction duplicate-removal IoU threshold:   0.50
+Detection-matching IoU threshold:              0.50
 
-```text
-Prediction confidence threshold:        0.25
-GT-overlap IoU threshold:                0.50
-Prediction duplicate-removal IoU:        0.50
-Faster R-CNN evaluation score threshold: 0.25
-Detection-matching IoU threshold:        0.50
-```
+The 0.25 candidate-prediction threshold refers to pseudo-label
+generation and annotation fusion. It is distinct from the downstream
+Faster R-CNN confusion-matrix evaluation threshold.
 
-For labeled images, predictions overlapping an expert annotation by more
-than IoU 0.50 are removed before pseudo-label fusion.
+For labeled images, predictions are compared class-agnostically with the
+available expert annotations. Predictions whose overlap with an expert
+annotation satisfies
 
-Remaining predictions are processed using class-agnostic greedy
-duplicate removal. A lower-confidence prediction is suppressed only
-when its IoU with a retained prediction exceeds 0.50.
+IoU > 0.50
 
-The ground-truth-overlap filtering stage is not applied to the
-additional unlabeled-image collection because expert boxes are not
-available for those images.
+are removed.
 
-These settings describe the Best A3 reproducibility pathway and should
-not be confused with the separate confidence-threshold analyses performed
-in Experiment 2.
+An overlap exactly equal to 0.50 is retained.
 
----
+After ground-truth-aware filtering, the remaining predictions are pooled
+image-wise and processed using greedy class-agnostic duplicate removal.
 
-## Faster R-CNN training and evaluation
+A lower-confidence prediction is suppressed only when its IoU with an
+already retained prediction satisfies
 
-The principal downstream comparisons use Faster R-CNN with a
-ResNet-50-FPN backbone.
+IoU > 0.50
 
-The main repeated-training configuration is:
+An IoU exactly equal to 0.50 is retained.
 
-```text
-Independent runs:            5
-Random seeds:                42--46
-Maximum epochs:              20
-Batch size:                  4
-Optimizer:                   SGD
-Initial learning rate:       0.005
-Momentum:                    0.9
-Weight decay:                0.0005
-Learning-rate scheduler:     StepLR
-Scheduler step size:         5 epochs
-Scheduler gamma:             0.1
-Early-stopping patience:     5
-Minimum improvement:         0.0001
-Checkpoint selection:        validation mAP
-Confusion-matrix threshold:  0.25
-Detection-matching IoU:      0.50
-```
+For additional unlabeled images, ground-truth-aware filtering is not
+applied because expert bounding boxes are unavailable. These predictions
+undergo confidence filtering and prediction-to-prediction duplicate
+removal instead.
 
-Each run is trained independently.
+Faster R-CNN Training
 
-The best checkpoint for each run is selected using validation mAP.
-The test partition is evaluated only after model training and checkpoint
-selection.
+The main downstream experiments use Faster R-CNN with a pretrained
+ResNet-50-FPN backbone and a prediction head configured for four tree
+species plus background.
 
-The 0.25 score threshold applies to confusion-matrix-based evaluation.
-mAP computation uses the detector outputs independently of this
-confusion-matrix score threshold.
+The principal repeated-training configuration is:
 
-Run-level outputs may include:
+Independent runs:             5
+Random seeds:                 42–46
+Maximum epochs:               20
+Batch size:                   4
+Optimizer:                    SGD
+Initial learning rate:        0.005
+Momentum:                     0.9
+Weight decay:                 0.0005
+Learning-rate scheduler:      StepLR
+Scheduler step size:          5 epochs
+Scheduler gamma:              0.1
+Early-stopping patience:      5
+Minimum improvement:          0.0001
+Checkpoint selection:         validation mAP
+Detection-matching IoU:       0.50
 
-* selected model checkpoints;
-* validation statistics;
-* test metrics;
-* confusion matrices;
-* class-level precision, recall, and F1-score;
-* macro-averaged metrics; and
-* run summaries used to calculate mean and sample standard deviation.
+Each Faster R-CNN configuration is initialized and trained independently.
+Weights and optimizer states are not transferred between downstream
+configurations.
 
----
+Validation mAP is computed during training, and the checkpoint with the
+highest validation mAP is retained for each run. The held-out test set is
+evaluated only after training and checkpoint selection.
 
-## Expected project layout
+Faster R-CNN Evaluation Thresholds
 
-After extracting the software and downloading the dataset, a typical
-directory structure is:
+The confusion-matrix score threshold is experiment-specific and should not
+be confused with the 0.25 confidence threshold used for candidate
+pseudo-label selection in the native-confidence annotation-refinement
+pipeline.
 
-```text
-Teacher_Assisted_Tree_Detection/
-├── EfficientTree-master/
-├── config/
-├── docs/
-├── src/
-│   └── fasterrcnn/
-├── stages/
-├── tools/
-├── configure_paths.cmd
-├── configure_paths.py
-├── preflight.cmd
-├── run_stage.cmd
-├── run_all.cmd
-├── requirements.txt
-└── environment.yml
+Experiment 3 Main Evaluation
+Confusion-matrix score threshold: 0.50
+Detection-matching IoU:           0.50
 
-DATA_ROOT/
-├── images/
-└── labels/
-    ├── train_labels.csv
-    ├── val_labels.csv
-    ├── test_labels.csv
-    └── unlabeled_images.txt
-```
+Best A3 was additionally examined using a threshold-sensitivity analysis
+at:
 
-The dataset may be stored anywhere on the user's computer and does not
-need to be copied into the software repository.
+0.25
+0.50
 
-Generated predictions, annotation-expanded datasets, model checkpoints,
-and experiment outputs should be written to separate output directories.
+The score threshold affects confusion-matrix-based Precision, Recall,
+F1-score, and Accuracy. It does not affect model optimization,
+validation-mAP-based checkpoint selection, or mAP computation.
 
----
+Experiment 4 Evaluation
+Confusion-matrix score threshold: 0.25
+Detection-matching IoU:           0.50
 
-## Path configuration
+mAP computation is performed independently of the confusion-matrix score
+threshold.
 
-This repository does not require public releases to contain
-machine-specific absolute paths.
+Running the Repository
+1. Configure Local Paths
 
-Users can configure their local dataset and Python paths with:
+Before running the pipeline, configure the local dataset location and
+Python executable.
 
-```text
+On Windows:
+
 configure_paths.cmd "D:\path\to\dataset" "C:\path\to\python.exe"
-```
 
-This creates:
+The corresponding Python implementation is:
 
-```text
+configure_paths.py
+
+This creates a local configuration file such as:
+
 config/paths.local.json
-```
 
-The generated `paths.local.json` contains machine-specific local paths
-and should not be committed to GitHub or included in a public software
-archive.
+Machine-specific path files should remain local and should not be
+committed to the public repository.
 
-A public template is provided in:
+A public template is provided as:
 
-```text
 config/paths.example.json
-```
+2. Install the Environment
 
----
+A Conda environment can be created using:
 
-## Pipeline organization
+conda env create -f environment.yml
 
-The reproducibility workflow is divided into stages so that individual
-components can be executed and inspected separately.
+Alternatively, dependencies can be installed into an existing compatible
+Python environment using:
 
-```text
+pip install -r requirements.txt
+
+GPU-based training requires a compatible NVIDIA GPU, CUDA installation,
+and CUDA-enabled PyTorch build.
+
+3. Run Preflight Checks
+
+Before starting model training or pseudo-label generation, run:
+
+preflight.cmd
+
+The preflight stage should be used to verify the local Python
+environment, configured paths, input datasets, and required files before
+computationally expensive stages are started.
+
+4. Run an Individual Pipeline Stage
+
+The main Windows stage launcher is:
+
+run_stage.cmd <stage_number>
+
+For example:
+
+run_stage.cmd 02
+
+The underlying Python stage runner is:
+
+run_stage.py
+
+The reproducibility workflow is organized as follows:
+
 01  Preflight checks
 02  Prepare the EfficientTree dataset
 03  Generate EfficientTree configuration files
@@ -472,248 +541,383 @@ components can be executed and inspected separately.
 10  Generate RetinaNet predictions
 11  Fuse predictions and construct A2_native
 12  Retrain EfficientTree using A2_native
-13  Warm-start Teacher--Student SSL from the A2-trained checkpoint
+13  Warm-start Teacher–Student SSL from the A2-trained checkpoint
 14  Generate SSL-enhanced predictions
 15  Construct A3_native,native
 16  Train and evaluate Faster R-CNN
 17  Summarize repeated-run results
-```
 
-Depending on the experiment, the dataset configuration supplied to these
-stages determines whether the Experiment 3/Dataset 2 or
-Experiment 4/Dataset 3 pathway is reproduced.
+The selected dataset configuration determines whether the Dataset 2 /
+Experiment 3 or Dataset 3 / Experiment 4 pathway is reproduced.
 
-A single stage can be run with:
+5. Run the Complete Configured Pipeline
 
-```text
-run_stage.cmd 02
-```
+After path configuration and successful preflight checks, the complete
+configured workflow can be launched with:
 
-The complete configured workflow can be run with:
-
-```text
 run_all.cmd
-```
 
-Users should inspect local configuration files, run the preflight checks,
-and verify input/output paths before beginning computationally expensive
-training.
+Because the full pipeline includes computationally expensive detector
+training and repeated evaluations, users should verify all local paths,
+dataset selections, and output directories before running the complete
+workflow.
 
----
+Important Experiment 4 Files
 
-## Coordinate and class conventions
+Several repository files are specifically associated with reproduction or
+evaluation of Experiment 4.
+
+run_experiment4_best_full_v2.py
+
+This script is associated with execution of the complete transferred
+Best A3 workflow on Dataset 3.
+
+Its workflow includes the Experiment 4 sequence from auxiliary prediction
+generation and A2 construction through EfficientTree retraining,
+warm-start Teacher–Student SSL, final A3 construction, and downstream
+Faster R-CNN processing.
+
+Users reproducing the complete Experiment 4 workflow should ensure that
+the Dataset 3 paths and Experiment 4-specific output directories are
+configured before execution.
+
+run_stage_exp4.py
+
+This is an Experiment 4-specific stage runner.
+
+It is intended for stage-by-stage execution or resumption of the
+Experiment 4 workflow rather than execution of the general Dataset 2
+pipeline.
+
+Experiment 3 and Experiment 4 should use separate output directories to
+avoid accidental reuse or overwriting of intermediate predictions,
+annotations, and checkpoints.
+
+exp4_on_dataset3_run_stage.py
+
+This script supports stage-oriented execution of the Experiment 4
+workflow under the Dataset 3 configuration.
+
+It should be treated as an Experiment 4 / Dataset 3 workflow utility
+rather than the general repository entry point.
+
+Users should verify Dataset 3 input paths and Experiment 4 output paths
+before running it.
+
+build_A3_native_native_without_unlabeled_D3.py
+
+This script constructs the Dataset 3 annotation-expanded training
+configuration corresponding to:
+
+A3_native,native — without final unlabeled inclusion
+
+The resulting final Faster R-CNN training configuration contains:
+
+Dataset 3 expert annotations; and
+accepted Best A3 predictions associated with the labeled Dataset 3
+training images.
+
+Accepted predictions originating from the additional unlabeled-image
+collection are not included in this final Faster R-CNN training set.
+
+This does not mean that unlabeled imagery is excluded from the
+complete Best A3 pipeline. The unlabeled collection is still used
+during upstream warm-start Teacher–Student SSL.
+
+eval_run01_score025.py
+
+This is an evaluation utility associated with evaluation of a trained
+Faster R-CNN run at a confusion-matrix score threshold of 0.25.
+
+It should not be interpreted as a training script.
+
+The score threshold affects confusion-matrix-based Precision, Recall,
+F1-score, and Accuracy. It does not define the pseudo-label fusion
+threshold and does not alter mAP computation.
+
+Experiment 3 uses 0.50 for its principal reported confusion-matrix
+evaluation and additionally examines 0.25 in the threshold-sensitivity
+analysis. Experiment 4 uses the corresponding 0.25 evaluation setting
+for the Dataset 3 runs.
+
+Supporting Repository Files
+environment.yml
+
+Conda environment specification used to define the software environment.
+
+requirements.txt
+
+Python dependency list for installation into an existing compatible
+environment.
+
+configure_paths.py
+
+Python implementation of the local path-configuration utility.
+
+configure_paths.cmd
+
+Recommended Windows wrapper for configuring the dataset and Python paths.
+
+origin_configure_paths.py
+
+An additional/original path-configuration helper retained in the
+repository.
+
+For normal public reproduction, users should generally use the current
+configuration entry points:
+
+configure_paths.cmd
+configure_paths.py
+
+unless specific reproduction instructions require the original helper.
+
+preflight.cmd
+
+Runs preflight checks before the main computational pipeline.
+
+run_stage.cmd
+
+Windows launcher for running an individual pipeline stage.
+
+run_stage.py
+
+Python stage-runner implementation used by the staged pipeline.
+
+run_all.cmd
+
+Runs the complete configured pipeline.
+
+pseudo_labeling_results.xlsx
+
+A results workbook associated with pseudo-labeling analyses. This file is
+not an executable component of the pipeline.
+
+train_explain.md
+
+Training-related documentation intended for reference rather than direct
+execution.
+
+Expected Project Layout
+
+A typical local structure is:
+
+Teacher_Assisted_Tree_Detection/
+├── EfficientTree-master/
+├── config/
+├── docs/
+├── src/
+│   └── fasterrcnn/
+├── stages/
+├── tools/
+├── configure_paths.cmd
+├── configure_paths.py
+├── preflight.cmd
+├── run_stage.cmd
+├── run_stage.py
+├── run_all.cmd
+├── requirements.txt
+└── environment.yml
+
+DATA_ROOT/
+├── images/
+└── labels/
+    ├── train_labels.csv
+    ├── val_labels.csv
+    ├── test_labels.csv
+    └── unlabeled_images.txt
+
+The dataset may be stored anywhere on the user's computer and does not
+need to be copied into the software repository.
+
+Generated predictions, expanded annotations, model checkpoints, and
+experiment outputs should be written to separate output directories.
+
+Coordinate and Class Conventions
 
 The original annotation CSV files use:
 
-```text
 filename,class,xmin,ymin,xmax,ymax
-```
 
-Class identifiers in the original CSV annotations are:
+The original class identifiers are:
 
-```text
-1, 2, 3, 4
-```
+1  Norway spruce   (Picea abies)
+2  Silver fir      (Abies alba)
+3  Scots pine      (Pinus sylvestris)
+4  European beech  (Fagus sylvatica)
 
 EfficientTree uses YOLO-style zero-based class identifiers:
 
-```text
 0, 1, 2, 3
-```
 
 The preparation scripts perform the required class mapping.
 
-The original annotation coordinate system uses 256 x 256 pixel imagery.
-EfficientTree data are prepared at 640 x 640 pixels when required, and
-predictions are converted back to the original coordinate system for
-annotation fusion and downstream processing.
+The original detection patches use a 256 × 256 pixel coordinate system.
 
----
+EfficientTree data may be prepared at 640 × 640 pixels when required,
+and predictions are converted back to the original coordinate system
+before annotation fusion and downstream Faster R-CNN processing.
 
-## EfficientTree / EfficientTeacher implementation
+Recommended Execution Order
 
-The EfficientTree component used in this study was based on the public
-implementation released by Hou et al.:
+For a new installation, the recommended workflow is:
 
-[https://github.com/houbr233/EfficientTree](https://github.com/houbr233/EfficientTree)
+1. Download the required dataset and reproducibility resources.
+2. Create or activate the required Python environment.
+3. Configure local paths with configure_paths.cmd.
+4. Run preflight.cmd.
+5. Verify dataset and output paths.
+6. Test individual stages using run_stage.cmd.
+7. Run the complete workflow with run_all.cmd when the staged checks pass.
 
-The present repository contains the study-specific configuration,
-data-preparation, prediction-processing, fusion, and downstream
-reproducibility workflow required to integrate EfficientTree into the
-tree-species annotation-expansion experiments.
+For Experiment 4, use the Experiment 4-specific runner or stage utilities
+after completing the common repository configuration.
 
----
+Important Reproducibility Notes
+Original images and expert annotations should remain unchanged.
+Expert annotations have priority over model-generated predictions.
+Generated annotation-expanded datasets should be written to separate
+output directories.
+Validation and test annotations must remain separate from training
+annotation expansion.
+Validation results should be used for model and checkpoint selection.
+Held-out test results should not be used to tune pseudo-label
+thresholds.
+Machine-specific path files should not be committed to the public
+repository.
+Intermediate prediction files and audit outputs should be retained when
+reproducing the complete refinement pathway.
+Experiment 3 and Experiment 4 should use separate output directories.
+The Experiment 4 without final unlabeled inclusion configuration
+still uses unlabeled imagery during upstream Teacher–Student SSL.
+The difference between the Experiment 4 with- and without-final-unlabeled
+configurations concerns only the final Faster R-CNN training dataset.
+Cross-dataset comparisons should be interpreted descriptively because
+Datasets 1, 2, and 3 contain different validation and test image
+allocations.
+Direct performance comparisons are most appropriate between
+configurations evaluated on the same fixed dataset-specific test
+partition.
+Reproducibility Scope
+Downstream Best A3 Faster R-CNN Reproduction
 
-## Software requirements
-
-The main Python dependencies are listed in:
-
-```text
-requirements.txt
-environment.yml
-```
-
-GPU training requires:
-
-* a compatible NVIDIA GPU;
-* a compatible CUDA installation;
-* PyTorch with CUDA support; and
-* sufficient storage for prepared datasets, predictions, checkpoints,
-  and repeated-run outputs.
-
-Exact CUDA and PyTorch builds may depend on the user's hardware and
-software environment.
-
----
-
-## Important reproducibility notes
-
-* Original images and expert annotations should remain unchanged.
-* Generated annotation-expanded datasets should be written to separate
-  output directories.
-* Expert annotations have priority over model-generated annotations.
-* Validation and test annotations must remain separate from the training
-  annotation-expansion process.
-* Validation results should be used for model/checkpoint selection.
-* Held-out test results should not be used to tune pseudo-label
-  thresholds.
-* Machine-specific path files should not be committed to the public
-  repository.
-* Intermediate prediction files and audit tables should be retained when
-  reproducing the full annotation-expansion pathway.
-* The Experiment 4 `without final unlabeled inclusion` condition still
-  uses unlabeled imagery during the upstream Teacher--Student SSL stage.
-* Experiment 3 and Experiment 4 should use separate output directories
-  to prevent accidental reuse or overwriting of intermediate artifacts.
-
----
-
-## Reproducibility scope
-
-Different public resources support different levels of reproduction.
-
-### Downstream Best A3 Faster R-CNN reproduction
-
-Users interested in reproducing only the final Best A3 Faster R-CNN
+Users interested only in reproducing the final Best A3 Faster R-CNN
 training and evaluation can use the released Best A3 annotation-expanded
-datasets together with the Faster R-CNN training code.
+training data together with the Faster R-CNN training and evaluation code.
 
-The corresponding Experiment 3 and Experiment 4 resources are available
-at:
+Resources:
 
-[https://zenodo.org/uploads/22063524](https://zenodo.org/uploads/22063524)
+https://zenodo.org/records/22063524
 
-### Complete Best A3 annotation-generation reproduction
+Complete Best A3 Annotation-Generation Reproduction
 
 Users wishing to regenerate Best A3 from the original expert annotations
-must additionally reproduce the upstream stages:
+must reproduce the complete upstream annotation-refinement pipeline:
 
-```text
 RetinaNet
-  +
+   +
 supervised EfficientTree
-  ↓
+   |
+   v
 A2_native fusion
-  ↓
+   |
+   v
 EfficientTree retraining on A2_native
-  ↓
-warm-start Teacher--Student SSL
-  ↓
-SSL-enhanced predictions
-  ↓
+   |
+   v
+warm-start Teacher–Student SSL
+   |
+   v
+SSL-enhanced EfficientTree predictions
+   |
+   v
+final A3 refinement
+   |
+   v
 A3_native,native
-```
 
-The source-code repository and complete software archive provide the
-corresponding implementation resources.
+The main GitHub repository and the complete Zenodo software archive
+provide the corresponding implementation resources.
 
----
+Data and Code Availability
 
-## Data and code availability
+Main GitHub repository
 
-The software, data, and dataset-partitioning resources used in this study
-are publicly available through the following repositories and archives.
+https://github.com/beheshtiniya/teacher-assisted-tree-species-detection-on-FasterRCNN
 
-**Main GitHub repository**
+Complete software archive
 
-[https://github.com/beheshtiniya/teacher-assisted-tree-species-detection-on-FasterRCNN](https://github.com/beheshtiniya/teacher-assisted-tree-species-detection-on-FasterRCNN)
+https://doi.org/10.5281/zenodo.21639908
 
-**Confidence-threshold pseudo-labeling implementation**
+Confidence-threshold pseudo-labeling implementation
 
-[https://github.com/beheshtiniya/pseudo-labeling-confidence-thresholds-tree-species-identification](https://github.com/beheshtiniya/pseudo-labeling-confidence-thresholds-tree-species-identification)
+https://github.com/beheshtiniya/pseudo-labeling-confidence-thresholds-tree-species-identification
 
-**Complete multi-source refinement software archive**
+Dataset 1 and additional unlabeled imagery
 
-[https://doi.org/10.5281/zenodo.21639908](https://doi.org/10.5281/zenodo.21639908)
+https://doi.org/10.5281/zenodo.21385214
 
-**Aerial imagery, expert annotations, unlabeled imagery, and Dataset 1--2 resources**
+Original pre-annotated dataset
 
-[https://doi.org/10.5281/zenodo.21385214](https://doi.org/10.5281/zenodo.21385214)
+https://doi.org/10.5281/zenodo.7528566
 
-**Original pre-annotated dataset**
+Dataset 2 reconstruction resources
 
-[https://doi.org/10.5281/zenodo.7528566](https://doi.org/10.5281/zenodo.7528566)
+https://zenodo.org/records/22013937
 
-**Dataset 2 reconstruction resources**
+Dataset 3 MILP partitioning resources
 
-[https://zenodo.org/records/22013937](https://zenodo.org/records/22013937)
+https://zenodo.org/records/22013323
 
-**Dataset 3 image-level MILP partitioning resources**
+Best A3 Experiment 3 and Experiment 4 reproducibility resources
 
-[https://zenodo.org/records/22013323](https://zenodo.org/records/22013323)
+https://zenodo.org/records/22063524
 
-**Best A3 Experiment 3 and Experiment 4 results and reproducibility resources**
+EfficientTree source implementation
 
-[https://zenodo.org/uploads/22063524](https://zenodo.org/uploads/22063524)
+https://github.com/houbr233/EfficientTree
 
-**EfficientTree source implementation**
+Dataset Citation
 
-[https://github.com/houbr233/EfficientTree](https://github.com/houbr233/EfficientTree)
+When using the associated imagery or expert annotations, please cite the
+corresponding dataset record:
 
----
+Dataset for Tree Species Detection in Heterogeneous Forests Using Aerial
+RGB Imagery. Zenodo.
+https://doi.org/10.5281/zenodo.21385214
 
-## Dataset citation
+The original pre-annotated source dataset is available at:
 
-Please cite the associated dataset when using the imagery or expert
-annotations:
+https://doi.org/10.5281/zenodo.7528566
 
-> Dataset for Tree Species Detection in Heterogeneous Forests Using
-> Aerial RGB Imagery. Zenodo.
-> [https://doi.org/10.5281/zenodo.21385214](https://doi.org/10.5281/zenodo.21385214)
+Users relying on Dataset 2 or Dataset 3 reconstruction resources should
+also cite the corresponding archive where appropriate:
 
-Users relying on Dataset 2 or Dataset 3 reconstruction should also cite
-the corresponding reconstruction or partitioning archive where
-appropriate.
+Dataset 2:
 
----
+https://zenodo.org/records/22013937
 
-## Software citation
+Dataset 3:
 
-Please cite the archived Zenodo software record associated with the
-version of the software used in your study:
+https://zenodo.org/records/22013323
 
-[https://doi.org/10.5281/zenodo.21639908](https://doi.org/10.5281/zenodo.21639908)
+Software Citation
+
+Please cite the archived Zenodo software record corresponding to the
+software release used in the study:
+
+https://doi.org/10.5281/zenodo.21639908
 
 When using the released Best A3 Experiment 3 or Experiment 4 datasets,
-results, or downstream Faster R-CNN reproducibility materials, please
-also cite the corresponding Best A3 archive:
+run-level results, or downstream Faster R-CNN reproducibility materials,
+please also cite:
 
-[https://zenodo.org/uploads/22063524](https://zenodo.org/uploads/22063524)
+https://zenodo.org/records/22063524
 
----
+License
 
-## License
-
-The software license is provided in the `LICENSE` file.
+The software license is provided in the LICENSE file.
 
 Datasets and external software components may be distributed under
 separate licenses. Users should consult the corresponding Zenodo records
 and upstream repositories before redistributing or reusing those
 materials.
-
-```
-
-چند تغییر مهمی که نسبت به README قبلی اعمال کردم: Experiment 3 دیگر صرفاً «fusion + SSL» معرفی نشده و مسیر واقعی `A2_native → retrain ET → warm-start SSL → A3_native,native` مشخص شده؛ Experiment 4 نیز صریحاً به‌عنوان **انتقال Best A3 از Dataset 2 به Dataset 3** معرفی شده است. همچنین تفاوت `with/without unlabeled` طوری نوشته شده که کسی تصور نکند حالت without-unlabeled در مرحله SSL از تصاویر بدون برچسب استفاده نکرده است.
-
-یک نکته هم درباره لینک `https://zenodo.org/uploads/22063524`: چون این آدرس را خودت برای رکورد نتایج دادی، در متن دقیقاً همان را گذاشتم. وقتی رکورد Zenodo نهایی و منتشر شد، اگر آدرس آن به فرم `https://zenodo.org/records/...` یا DOI تبدیل شد، **بهتر است همه این موارد را با URL/DOI نهایی رکورد جایگزین کنی**؛ برای citation پایدارتر است.
-```
